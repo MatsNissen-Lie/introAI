@@ -31,6 +31,7 @@ class Map_Obj():
     get_maps()
         Get integer and string maps
     """
+
     def __init__(self, task: int = 1) -> None:
         """Instantiate a map object for task number `task`.
 
@@ -42,6 +43,8 @@ class Map_Obj():
         self.start_pos, self.goal_pos, self.end_goal_pos, \
             self.path_to_map = self.fill_critical_positions(task)
         self.int_map, self.str_map = self.read_map(self.path_to_map)
+
+        # task 5
         self.tmp_cell_value = self.get_cell_value(self.goal_pos)
         self.set_cell_value(self.start_pos, ' S ')
         self.set_cell_value(self.goal_pos, ' G ')
