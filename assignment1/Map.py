@@ -354,12 +354,5 @@ class Map_Obj():
                         pixels[x * scale + i,
                                y * scale + j] = colors[themap[y][x]]
         # Create a drawing context to add axes
-        draw = ImageDraw.Draw(image)
-
-        # Draw x-axis (horizontal line)
-        draw.line([(0, height * scale // 2), (width * scale, height * scale // 2)], fill=(0, 0, 0), width=10)
-
-        # Draw y-axis (vertical line)
-        draw.line([(width * scale // 2, 0), (width * scale // 2, height * scale)], fill=(0, 0, 0), width=10)
         # Show image
         image.show()
