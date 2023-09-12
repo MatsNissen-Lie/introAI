@@ -315,7 +315,8 @@ class Actions:
                    Directions.NORTH: (0, 1),
                    Directions.SOUTH: (0, -1)}
 
-    _directionsAsList = [('West', (-1, 0)), ('Stop', (0, 0)), ('East', (1, 0)), ('North', (0, 1)), ('South', (0, -1))]
+    _directionsAsList = [('West', (-1, 0)), ('Stop', (0, 0)),
+                         ('East', (1, 0)), ('North', (0, 1)), ('South', (0, -1))]
 
     TOLERANCE = .001
 
@@ -519,7 +520,7 @@ class GameStateData:
         Creates an initial game state from a layout array (see layout.py).
         """
         self.food = layout.food.copy()
-        #self.capsules = []
+        # self.capsules = []
         self.capsules = layout.capsules[:]
         self.layout = layout
         self.score = 0
@@ -748,8 +749,8 @@ class Game:
 
             # Change the display
             self.display.update(self.state.data)
-            ###idx = agentIndex - agentIndex % 2 + 1
-            ###self.display.update( self.state.makeObservation(idx).data )
+            # idx = agentIndex - agentIndex % 2 + 1
+            # self.display.update( self.state.makeObservation(idx).data )
 
             # Allow for game specific conditions (winning, losing, etc.)
             self.rules.process(self.state, self)

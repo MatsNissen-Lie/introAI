@@ -26,6 +26,8 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+import time
+import signal
 import sys
 import inspect
 import heapq
@@ -576,7 +578,7 @@ def sign(x):
     """
     Returns 1 or -1 depending on the sign of x
     """
-    if(x >= 0):
+    if (x >= 0):
         return 1
     else:
         return -1
@@ -647,8 +649,6 @@ def pause():
 # of active time outs.  Currently, questions which have test cases calling
 # this have all student code so wrapped.
 #
-import signal
-import time
 
 
 class TimeoutFunctionException(Exception):
@@ -702,9 +702,9 @@ def mutePrint():
     _MUTED = True
 
     _ORIGINAL_STDOUT = sys.stdout
-    #_ORIGINAL_STDERR = sys.stderr
+    # _ORIGINAL_STDERR = sys.stderr
     sys.stdout = WritableNull()
-    #sys.stderr = WritableNull()
+    # sys.stderr = WritableNull()
 
 
 def unmutePrint():
@@ -714,4 +714,4 @@ def unmutePrint():
     _MUTED = False
 
     sys.stdout = _ORIGINAL_STDOUT
-    #sys.stderr = _ORIGINAL_STDERR
+    # sys.stderr = _ORIGINAL_STDERR
