@@ -388,7 +388,7 @@ class PacmanRules:
                 state.data.scoreChange += 500
                 state.data._win = True
         # Eat capsule
-        if(position in state.getCapsules()):
+        if (position in state.getCapsules()):
             state.data.capsules.remove(position)
             state.data._capsuleEaten = position
             # Reset all ghosts' scared timers
@@ -662,7 +662,7 @@ def replayGame(layout, actions, display):
     display.initialize(state.data)
 
     for action in actions:
-            # Execute the action
+        # Execute the action
         state = state.generateSuccessor(*action)
         # Change the display
         display.update(state.data)
@@ -682,7 +682,7 @@ def runGames(layout, pacman, ghosts, display, numGames, record, numTraining=0, c
     for i in range(numGames):
         beQuiet = i < numTraining
         if beQuiet:
-                # Suppress output and graphics
+            # Suppress output and graphics
             import textDisplay
             gameDisplay = textDisplay.NullGraphics()
             rules.quiet = True
