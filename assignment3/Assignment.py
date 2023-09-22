@@ -145,7 +145,12 @@ class CSP:
         # Call backtrack with the partial assignment 'assignment'
         return self.backtrack(assignment)
 
-    def backtrack(self, assignment):
+    # X is a set of variables
+    # • D is an assignment of a domain to each variable, where a domain is the set of legal values for the
+    # given variable,
+    # • C is the set of constraints, where a constraint is a set of legal pairs of values for two given variables.
+
+    def backtrack(self, assignment, depth=0):
         """The function 'Backtrack' from the pseudocode in the
         textbook.
 
@@ -170,16 +175,9 @@ class CSP:
         iterations of the loop.
         """
 
-        # give me a import to print dictionary json format
-        # print(json.dumps(assignment, indent=4))
-        # print("––––––––––––––––––––––––––––––––––––––––––")
-        print(json.dumps(self.constraints, indent=4))
-        # print(self.constraints)
-
         # function BACKTRACK(csp, assignment) returns a solution or failure
         # if assignment is complete then return assignment
         # var ← SELECT-UNASSIGNED-VARIABLE(csp, assignment)
-
         # for each value in ORDER-DOMAIN-VALUES(csp, var, assignment) do
         # if value is consistent with assignment then
         # add {var = value} to assignment inferences←INFERENCE(csp,var,assignment) if inferences ̸= failure then
@@ -194,18 +192,34 @@ class CSP:
             return assignment
         var = self.select_unassigned_variable(assignment)
 
+        # we can arrange the values in a order so that we check the least constraining value first // den verdien som har færrest begrensninger for fremtidige løsninger. Hence:
+        # for each value in ORDER-DOMAIN-VALUES(csp, var, assignment) do
+
+        print("Depth:", depth)
+        print("Var:", var)
+        print("muligheter:", assignment[var])
+
         for value in assignment[var]:
-            1
+            # if self.check_if_consistent(var, value):
+            if True:
+                assignment[var] = [value]
+                inferences = self.inference(assignment, self.get_all_arcs())
+                if inferences:
+                    # add inferences to csp
 
-        return assignment
+                    result = self.backtrack(assignment, depth+1)
+                    if result:
+                        return result
+                assignment[var] = value
+        return
 
-    def check_if_consistent(self, assignment, var, value):
-        for key in assignment:
-            if key != var:
-                for val in assignment[key]:
-                    if val == value:
-                        return False
-        return True
+    # def check_if_consistent(self, var, value):
+    #     var_contraints = self.constraints[var]
+    #     for key, leagal_pairs in var_contraints.items():
+    #         for value_pair in leagal_pairs:
+    #             if value in value_pair:
+    #                 return True
+    #     return False
 
     def check_if_complete(self, assignment):
         for key in assignment:
@@ -214,10 +228,12 @@ class CSP:
         return True
 
     def select_unassigned_variable(self, assignment):
+        # check constraints maybe?
         smallestDomain = 10
         smallestDomainKey = ""
         for key in assignment:
-            if len(assignment[key]) < smallestDomain:
+            # print("key:", key, assignment[key])
+            if len(assignment[key]) < smallestDomain and len(assignment[key]) > 1:
                 smallestDomain = len(assignment[key])
                 smallestDomainKey = key
         return smallestDomainKey
@@ -228,9 +244,26 @@ class CSP:
         the lists of legal values for each undecided variable. 'queue'
         is the initial queue of arcs that should be visited.
         """
-        # TODO: YOUR CODE HERE
+        # queue←a queue of arcs, initially all the arcs in csp
+        # while queue is not empty do (Xi, Xj)←POP(queue)
+        #     if REVISE(csp, Xi, Xj) then
+        #     if size of Di = 0 then return false
+        #     for each Xk in Xi.NEIGHBORS - {Xj} do
+        #         add (Xk, Xi) to queue
+        # return True
+        queue = self.get_all_arcs()
+        while queue:
+            (i, j) = queue.pop()
+
+            if self.revise(assignment, i, j):
+                if len(assignment[i]) == 0:
+                    return False
+                for k in self.get_all_neighboring_arcs(i):
+                    if k[1] != j:
+                        queue.append(k)
         return True
 
+    # function REVISE(csp, Xi, Xj) returns true iff we revise the domain of Xi revised ← false
     def revise(self, assignment, i, j):
         """The function 'Revise' from the pseudocode in the textbook.
         'assignment' is the current partial assignment, that contains
@@ -240,8 +273,25 @@ class CSP:
         between i and j, the value should be deleted from i's list of
         legal values in 'assignment'.
         """
-        # TODO: YOUR CODE HERE
-        pass
+        # for each x in Di do
+        #    if no value y in Dj allows (x,y) to satisfy the constraint between Xi and Xj then
+        #    delete x from Di
+        #    revised ← true
+        # return revised
+        revised = False
+
+        for x in assignment[i]:
+            no_valid_value = True
+            for y in assignment[j]:
+                if (x, y) in self.constraints[i][j]:
+                    no_valid_value = False
+            if no_valid_value:
+                # print("removing:", x)
+                # print("from:", i)
+                # print("constraints:", self.constraints[i][j])
+                assignment[i].remove(x)
+                revised = True
+        return revised
 
 
 def create_map_coloring_csp():
@@ -301,7 +351,6 @@ def create_sudoku_csp(filename: str) -> CSP:
                 for col in range(box_col * 3, (box_col + 1) * 3):
                     cells.append('%d-%d' % (row, col))
             csp.add_all_different_constraint(cells)
-
     return csp
 
 
@@ -324,6 +373,9 @@ def print_sudoku_solution(solution):
 
 modal0 = create_map_coloring_csp()
 
-modal = create_sudoku_csp('assignment3/easy.txt')
-
-print_sudoku_solution(modal.backtracking_search())
+modal = create_sudoku_csp('assignment3/hard.txt')
+# modal0.backtracking_search()
+# print_sudoku_solution(modal.domains)
+res = modal.backtracking_search()
+print("res:", res)
+# print_sudoku_solution(res)
