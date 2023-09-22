@@ -146,6 +146,13 @@ def getLayout(name, back=2):
         layout = tryToLoad('layouts/' + name + '.lay')
         if layout == None:
             layout = tryToLoad(name + '.lay')
+
+    # if layout == None:
+    #     script_dir = os.path.dirname(os.path.abspath(__file__))
+    #     fullname = os.path.join(script_dir, "layouts/", name)
+    #     print(("Trying to load full name", fullname))
+    #     layout = tryToLoad(fullname)
+
     if layout == None and back >= 0:
         curdir = os.path.abspath('.')
         os.chdir('..')
@@ -155,9 +162,10 @@ def getLayout(name, back=2):
 
 
 def tryToLoad(fullname):
-    if(not os.path.exists(fullname)):
+    path = os.path.join(os.getcwd(), "assignment3/multiagent/", fullname)
+    if (not os.path.exists(path)):
         return None
-    f = open(fullname)
+    f = open(path)
     try:
         return Layout([line.strip() for line in f])
     finally:
