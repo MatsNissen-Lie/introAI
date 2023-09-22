@@ -4,6 +4,7 @@
 
 import copy
 from itertools import product as prod
+import json
 
 
 class CSP:
@@ -168,17 +169,58 @@ class CSP:
         assignments and inferences that took place in previous
         iterations of the loop.
         """
+
+        # give me a import to print dictionary json format
+        # print(json.dumps(assignment, indent=4))
+        # print("––––––––––––––––––––––––––––––––––––––––––")
+        print(json.dumps(self.constraints, indent=4))
+        # print(self.constraints)
+
+        # function BACKTRACK(csp, assignment) returns a solution or failure
+        # if assignment is complete then return assignment
+        # var ← SELECT-UNASSIGNED-VARIABLE(csp, assignment)
+
+        # for each value in ORDER-DOMAIN-VALUES(csp, var, assignment) do
+        # if value is consistent with assignment then
+        # add {var = value} to assignment inferences←INFERENCE(csp,var,assignment) if inferences ̸= failure then
+        # add inferences to csp
+        # result ← BACKTRACK(csp, assignment) if result ̸= failure then return result remove inferences from csp
+        # remove {var = value} from assignment return failure
+        # if assignemnt is complete:
+        #     return assignment
         # TODO: YOUR CODE HERE
-        pass
+
+        if self.check_if_complete(assignment):
+            return assignment
+        var = self.select_unassigned_variable(assignment)
+
+        for value in assignment[var]:
+            1
+
+        return assignment
+
+    def check_if_consistent(self, assignment, var, value):
+        for key in assignment:
+            if key != var:
+                for val in assignment[key]:
+                    if val == value:
+                        return False
+        return True
+
+    def check_if_complete(self, assignment):
+        for key in assignment:
+            if len(assignment[key]) != 1:
+                return False
+        return True
 
     def select_unassigned_variable(self, assignment):
-        """The function 'Select-Unassigned-Variable' from the pseudocode
-        in the textbook. Should return the name of one of the variables
-        in 'assignment' that have not yet been decided, i.e. whose list
-        of legal values has a length greater than one.
-        """
-        # TODO: YOUR CODE HERE
-        pass
+        smallestDomain = 10
+        smallestDomainKey = ""
+        for key in assignment:
+            if len(assignment[key]) < smallestDomain:
+                smallestDomain = len(assignment[key])
+                smallestDomainKey = key
+        return smallestDomainKey
 
     def inference(self, assignment, queue):
         """The function 'AC-3' from the pseudocode in the textbook.
@@ -187,7 +229,7 @@ class CSP:
         is the initial queue of arcs that should be visited.
         """
         # TODO: YOUR CODE HERE
-        pass
+        return True
 
     def revise(self, assignment, i, j):
         """The function 'Revise' from the pseudocode in the textbook.
@@ -270,9 +312,18 @@ def print_sudoku_solution(solution):
     """
     for row in range(9):
         for col in range(9):
-            print(solution['%d-%d' % (row, col)][0], end=" "),
+            domain = solution['%d-%d' % (row, col)]
+            value = domain[0] if len(domain) == 1 else '0'
+            print(value, end=" "),
             if col == 2 or col == 5:
                 print('|', end=" "),
         print("")
         if row == 2 or row == 5:
             print('------+-------+------')
+
+
+modal0 = create_map_coloring_csp()
+
+modal = create_sudoku_csp('assignment3/easy.txt')
+
+print_sudoku_solution(modal.backtracking_search())
