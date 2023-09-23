@@ -18,6 +18,7 @@ class CSP:
         # self.constraints[i][j] is a list of legal value pairs for
         # the variable pair (i, j)
         self.constraints = {}
+        self.last_checked = None
 
     def add_variable(self, name: str, domain: list):
         """Add a new variable to the CSP.
@@ -202,6 +203,7 @@ class CSP:
         for value in assignment[var]:
             # if self.check_if_consistent(var, value):
             if True:
+                print("value:", value)
                 assignment[var] = [value]
                 inferences = self.inference(assignment, self.get_all_arcs())
                 if inferences:
@@ -233,9 +235,11 @@ class CSP:
         smallestDomainKey = ""
         for key in assignment:
             # print("key:", key, assignment[key])
+            # and key != self.last_checked:
             if len(assignment[key]) < smallestDomain and len(assignment[key]) > 1:
                 smallestDomain = len(assignment[key])
                 smallestDomainKey = key
+        self.last_checked = smallestDomainKey
         return smallestDomainKey
 
     def inference(self, assignment, queue):
@@ -379,3 +383,4 @@ modal = create_sudoku_csp('assignment3/hard.txt')
 res = modal.backtracking_search()
 print("res:", res)
 # print_sudoku_solution(res)
+print_sudoku_solution(modal.domains)
