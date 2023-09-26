@@ -201,16 +201,18 @@ class CSP:
         print("muligheter:", assignment[var])
 
         # for value in self.order_domain_values(var, assignment):
+        assignemnt_copy = assignment.copy()
         values = assignment[var].copy()
         for value in values:
             # if self.check_if_consistent(var, value):
             print("value:", value)
             assignment[var] = [value]
-            inferences = self.inference(assignment)
+            inferences = self.inference(
+                assignment, self.get_all_neighboring_arcs(var))
             if inferences:
                 # add inferences to csp
                 print("consitent", var, " for ", value)
-                result = self.backtrack(assignment.copy(), depth+1)
+                result = self.backtrack(assignemnt_copy, depth+1)
                 if result:
                     return result
 
@@ -218,7 +220,7 @@ class CSP:
             print("inconsitent for:", value, "from:", var)
             new_values = list(filter(lambda x: x != value, assignment[var]))
             print("new_values:", values)
-            assignment[var] = values
+            assignment = assignemnt_copy
         return None
 
     def check_if_complete(self, assignment):
@@ -246,7 +248,7 @@ class CSP:
     #     constraints = self.get_all_neighboring_arcs(var)
     #     return sorted(values, key=lambda x: self.constraint_count(var), reverse=True)
 
-    def inference(self, assignment, queue=[]):
+    def inference(self, assignment, queue):
         """The function 'AC-3' from the pseudocode in the textbook.
         'assignment' is the current partial assignment, that contains
         the lists of legal values for each undecided variable. 'queue'
@@ -260,7 +262,6 @@ class CSP:
         #         add (Xk, Xi) to queue
         # return True
         # skal denne alltid ha alle arcs? eller skal man sende inn de som gjelder for denne posisjonen?
-        queue = self.get_all_arcs()
         while queue:
             (i, j) = queue.pop()
 
