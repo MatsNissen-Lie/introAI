@@ -200,28 +200,26 @@ class CSP:
         print("Var:", var)
         print("muligheter:", assignment[var])
 
-        for value in assignment[var]:
+        # for value in self.order_domain_values(var, assignment):
+        values = assignment[var].copy()
+        for value in values:
             # if self.check_if_consistent(var, value):
-            if True:
-                print("value:", value)
-                assignment[var] = [value]
-                inferences = self.inference(assignment, self.get_all_arcs())
-                if inferences:
-                    # add inferences to csp
+            print("value:", value)
+            assignment[var] = [value]
+            inferences = self.inference(assignment)
+            if inferences:
+                # add inferences to csp
+                print("consitent", var, " for ", value)
+                result = self.backtrack(assignment.copy(), depth+1)
+                if result:
+                    return result
 
-                    result = self.backtrack(assignment, depth+1)
-                    if result:
-                        return result
-                assignment[var] = value
-        return
-
-    # def check_if_consistent(self, var, value):
-    #     var_contraints = self.constraints[var]
-    #     for key, leagal_pairs in var_contraints.items():
-    #         for value_pair in leagal_pairs:
-    #             if value in value_pair:
-    #                 return True
-    #     return False
+            # disse linjene blir aldri kjørt på medium eller easy sudoku
+            print("inconsitent for:", value, "from:", var)
+            new_values = list(filter(lambda x: x != value, assignment[var]))
+            print("new_values:", values)
+            assignment[var] = values
+        return None
 
     def check_if_complete(self, assignment):
         for key in assignment:
@@ -229,20 +227,26 @@ class CSP:
                 return False
         return True
 
-    def select_unassigned_variable(self, assignment):
-        # check constraints maybe?
-        smallestDomain = 10
-        smallestDomainKey = ""
-        for key in assignment:
-            # print("key:", key, assignment[key])
-            # and key != self.last_checked:
-            if len(assignment[key]) < smallestDomain and len(assignment[key]) > 1:
-                smallestDomain = len(assignment[key])
-                smallestDomainKey = key
-        self.last_checked = smallestDomainKey
-        return smallestDomainKey
+    def constraint_count(self, var):
+        arcs = self.get_all_neighboring_arcs(var)
+        sum = 0
+        for arc in arcs:
+            sum += len(self.constraints[arc[0]][arc[1]])
+        return sum
 
-    def inference(self, assignment, queue):
+    def select_unassigned_variable(self, assignment):
+        keys = list(assignment.keys())
+        sorted(keys, key=lambda x: self.constraint_count(x), reverse=True)
+        most_wanted = sorted(keys, key=lambda x: len(
+            assignment[x]) if len(assignment[x]) > 1 else 10)[0]
+        return most_wanted
+
+    # def order_domain_values(self, var, assignment):
+    #     values = assignment[var]
+    #     constraints = self.get_all_neighboring_arcs(var)
+    #     return sorted(values, key=lambda x: self.constraint_count(var), reverse=True)
+
+    def inference(self, assignment, queue=[]):
         """The function 'AC-3' from the pseudocode in the textbook.
         'assignment' is the current partial assignment, that contains
         the lists of legal values for each undecided variable. 'queue'
@@ -255,6 +259,7 @@ class CSP:
         #     for each Xk in Xi.NEIGHBORS - {Xj} do
         #         add (Xk, Xi) to queue
         # return True
+        # skal denne alltid ha alle arcs? eller skal man sende inn de som gjelder for denne posisjonen?
         queue = self.get_all_arcs()
         while queue:
             (i, j) = queue.pop()
@@ -382,5 +387,5 @@ modal = create_sudoku_csp('assignment3/hard.txt')
 # print_sudoku_solution(modal.domains)
 res = modal.backtracking_search()
 print("res:", res)
-# print_sudoku_solution(res)
-print_sudoku_solution(modal.domains)
+# print_sudoku_solution(modal.domains)
+print_sudoku_solution(res)
