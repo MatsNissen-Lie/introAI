@@ -201,8 +201,9 @@ class CSP:
         print("muligheter:", assignment[var])
 
         # for value in self.order_domain_values(var, assignment):
-        assignemnt_copy = assignment.copy()
-        values = assignment[var].copy()
+        assignemnt_copy = copy.deepcopy(assignment)
+
+        values = assignment[var]
         for value in values:
             # if self.check_if_consistent(var, value):
             print("value:", value)
@@ -239,7 +240,7 @@ class CSP:
 
     def select_unassigned_variable(self, assignment):
         keys = list(assignment.keys())
-        sorted(keys, key=lambda x: self.constraint_count(x), reverse=True)
+        sorted(keys, key=lambda x: self.constraint_count(x))
         most_wanted = sorted(keys, key=lambda x: len(
             assignment[x]) if len(assignment[x]) > 1 else 10)[0]
         return most_wanted
