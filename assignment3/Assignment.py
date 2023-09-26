@@ -210,17 +210,18 @@ class CSP:
             inferences = self.inference(
                 assignment, self.get_all_neighboring_arcs(var))
             if inferences:
-                # add inferences to csp
-                print("consitent", var, " for ", value)
-                result = self.backtrack(assignemnt_copy, depth+1)
+                result = self.backtrack(assignment, depth+1)
                 if result:
                     return result
 
             # disse linjene blir aldri kjørt på medium eller easy sudoku
-            print("inconsitent for:", value, "from:", var)
-            new_values = list(filter(lambda x: x != value, assignment[var]))
-            print("new_values:", values)
+            # print("inconsitent for:", value, "from:", var)
             assignment = assignemnt_copy
+            # remove {var = value} from assignment return failur
+            assignment[var] = list(
+                filter(lambda x: x != value, assignment[var]))
+            print("new_values:", assignment[var])
+
         return None
 
     def check_if_complete(self, assignment):
@@ -269,7 +270,7 @@ class CSP:
                 if len(assignment[i]) == 0:
                     return False
                 for k in self.get_all_neighboring_arcs(i):
-                    if k[1] != j:
+                    if (k != (j, i) and k != (i, j)):  # do not add the arc that was just revised
                         queue.append(k)
         return True
 
