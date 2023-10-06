@@ -19,6 +19,14 @@ class CSP:
         # the variable pair (i, j)
         self.constraints = {}
         self.last_checked = None
+        self.backtrack_count = 0
+        self.backtrack_fails = 0
+        
+    def increment(self):
+        self.backtrack_count += 1
+        
+    def fail(self):
+        self.backtrack_fails += 1
 
     def add_variable(self, name: str, domain: list):
         """Add a new variable to the CSP.
@@ -128,6 +136,7 @@ class CSP:
         for (i, j) in self.get_all_possible_pairs(var_list, var_list):
             if i != j:
                 self.add_constraint_one_way(i, j, lambda x, y: x != y)
+                
 
     def backtracking_search(self):
         """This functions starts the CSP solver and returns the found
@@ -152,6 +161,7 @@ class CSP:
     # • C is the set of constraints, where a constraint is a set of legal pairs of values for two given variables.
 
     def backtrack(self, assignment, depth=0):
+        
         """The function 'Backtrack' from the pseudocode in the
         textbook.
 
@@ -188,7 +198,7 @@ class CSP:
         # if assignemnt is complete:
         #     return assignment
         # TODO: YOUR CODE HERE
-
+        self.increment()
         if self.check_if_complete(assignment):
             return assignment
         var = self.select_unassigned_variable(assignment)
@@ -222,7 +232,8 @@ class CSP:
             assignment[var] = list(
                 filter(lambda x: x != value, assignment[var]))
             print("new_values:", assignment[var])
-
+            
+        self.fail()
         return None
 
     def check_if_complete(self, assignment):
@@ -385,10 +396,14 @@ def print_sudoku_solution(solution):
 
 modal0 = create_map_coloring_csp()
 
-modal = create_sudoku_csp('assignment3/hard.txt')
+modal = create_sudoku_csp('assignment3/easy.txt')
 # modal0.backtracking_search()
 # print_sudoku_solution(modal.domains)
 res = modal.backtracking_search()
 print("res:", res)
+
+
 # print_sudoku_solution(modal.domains)
 print_sudoku_solution(res)
+print(f"backtrack was called {modal.backtrack_count} times")
+print(f"it failed {modal.backtrack_fails} times")
