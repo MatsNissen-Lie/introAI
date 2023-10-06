@@ -225,15 +225,9 @@ class CSP:
                 if result:
                     return result
 
-            # disse linjene blir aldri kjørt på medium eller easy sudoku
-            # print("inconsitent for:", value, "from:", var)
             assignment = assignemnt_copy
-            # remove {var = value} from assignment return failur
             assignment[var] = list(
                 filter(lambda x: x != value, assignment[var]))
-            print("new_values:", assignment[var])
-            
-        self.fail()
         return None
 
     def check_if_complete(self, assignment):
@@ -309,9 +303,6 @@ class CSP:
                 if (x, y) in self.constraints[i][j]:
                     no_valid_value = False
             if no_valid_value:
-                # print("removing:", x)
-                # print("from:", i)
-                # print("constraints:", self.constraints[i][j])
                 assignment[i].remove(x)
                 revised = True
         return revised
@@ -396,13 +387,10 @@ def print_sudoku_solution(solution):
 
 modal0 = create_map_coloring_csp()
 
-modal = create_sudoku_csp('assignment3/easy.txt')
+modal = create_sudoku_csp('assignment3/veryhard.txt')
 # modal0.backtracking_search()
 # print_sudoku_solution(modal.domains)
 res = modal.backtracking_search()
-print("res:", res)
-
-
 # print_sudoku_solution(modal.domains)
 print_sudoku_solution(res)
 print(f"backtrack was called {modal.backtrack_count} times")
