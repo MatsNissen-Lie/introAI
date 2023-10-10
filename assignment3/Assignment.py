@@ -20,13 +20,7 @@ class CSP:
         self.constraints = {}
         self.last_checked = None
         self.backtrack_count = 0
-        self.backtrack_fails = 0
-        
-    def increment(self):
-        self.backtrack_count += 1
-        
-    def fail(self):
-        self.backtrack_fails += 1
+        self.failure_count = 0
 
     def add_variable(self, name: str, domain: list):
         """Add a new variable to the CSP.
@@ -136,7 +130,6 @@ class CSP:
         for (i, j) in self.get_all_possible_pairs(var_list, var_list):
             if i != j:
                 self.add_constraint_one_way(i, j, lambda x, y: x != y)
-                
 
     def backtracking_search(self):
         """This functions starts the CSP solver and returns the found
@@ -146,6 +139,8 @@ class CSP:
         # domains of the CSP variables. The deep copy is required to
         # ensure that any changes made to 'assignment' does not have any
         # side effects elsewhere.
+        self.failure_count = 0
+        self.backtrack_count = 0
         assignment = copy.deepcopy(self.domains)
 
         # Run AC-3 on all constraints in the CSP, to weed out all of the
@@ -161,7 +156,6 @@ class CSP:
     # • C is the set of constraints, where a constraint is a set of legal pairs of values for two given variables.
 
     def backtrack(self, assignment, depth=0):
-        
         """The function 'Backtrack' from the pseudocode in the
         textbook.
 
@@ -206,9 +200,9 @@ class CSP:
         # we can arrange the values in a order so that we check the least constraining value first // den verdien som har færrest begrensninger for fremtidige løsninger. Hence:
         # for each value in ORDER-DOMAIN-VALUES(csp, var, assignment) do
 
-        print("Depth:", depth)
-        print("Var:", var)
-        print("muligheter:", assignment[var])
+        # print("Depth:", depth)
+        # print("Var:", var)
+        # print("muligheter:", assignment[var])
 
         # for value in self.order_domain_values(var, assignment):
         assignemnt_copy = copy.deepcopy(assignment)
@@ -216,11 +210,12 @@ class CSP:
         values = assignment[var]
         for value in values:
             # if self.check_if_consistent(var, value):
-            print("value:", value)
+            # print("value:", value)
             assignment[var] = [value]
             inferences = self.inference(
                 assignment, self.get_all_neighboring_arcs(var))
             if inferences:
+                self.backtrack_count += 1
                 result = self.backtrack(assignment, depth+1)
                 if result:
                     return result
@@ -228,6 +223,7 @@ class CSP:
             assignment = assignemnt_copy
             assignment[var] = list(
                 filter(lambda x: x != value, assignment[var]))
+        self.failure_count += 1
         return None
 
     def check_if_complete(self, assignment):
@@ -385,13 +381,19 @@ def print_sudoku_solution(solution):
             print('------+-------+------')
 
 
-modal0 = create_map_coloring_csp()
+sudukus = ["easy", "medium", "hard", "veryhard"]
+for suduku in sudukus:
+    print("–––––––––––––––– Solving", suduku, "––––––––––––––––")
+    modal = create_sudoku_csp('assignment3/'+suduku+'.txt')
+    res = modal.backtracking_search()
+    # print_sudoku_solution(res)
+    print(f"Backtrack count: {modal.backtrack_count}")
+    print(f"Failure count: {modal.failure_count}")
+    # print("––––––––––––––––––––––––––––––––––––––––––––––––")
 
-modal = create_sudoku_csp('assignment3/veryhard.txt')
-# modal0.backtracking_search()
-# print_sudoku_solution(modal.domains)
-res = modal.backtracking_search()
-# print_sudoku_solution(modal.domains)
-print_sudoku_solution(res)
-print(f"backtrack was called {modal.backtrack_count} times")
-print(f"it failed {modal.backtrack_fails} times")
+# modal = create_sudoku_csp('assignment3/veryhard.txt')
+# # modal0.backtracking_search()
+# # print_sudoku_solution(modal.domains)
+# res = modal.backtracking_search()
+# # print_sudoku_solution(modal.domains)
+# print_sudoku_solution(res)
